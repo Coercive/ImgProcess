@@ -703,4 +703,31 @@ class ImageEngine {
 
 	}
 
+	/**
+	 * GET IMAGE QUALITY FROM FILE
+	 *
+	 * @param string $sImgFilePath
+	 * @return int|null
+	 */
+	public function getImageQuality($sImgFilePath) {
+
+		# VERIFY
+		if(!file_exists($sImgFilePath) || !is_file($sImgFilePath)) { return null; }
+
+		# GET INFOS
+		exec("identify -verbose $sImgFilePath", $aOutpout);
+		if(!$aOutpout) { return null; }
+
+		# DETECT "Quality" line
+		foreach ($aOutpout as $sLine) {
+			$sLine = trim($sLine);
+			if(strpos($sLine, 'Quality: ') !== 0) { continue; }
+			$aQuality = explode(': ', $sLine);
+			if(isset($aQuality[1])) { return intval($aQuality[1]); }
+		}
+
+		return null;
+
+	}
+
 }

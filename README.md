@@ -50,4 +50,8 @@ if( !$bVerif ) {
 	}
 }
 
+# DETECT IMAGE QUALITY (base on linux 'identify')
+$iQuality = $oImg->getImageQuality('/path/image_name.jpg');
+echo $iQuality;
+
 ```
