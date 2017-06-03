@@ -10,8 +10,8 @@ Get
 composer require coercive/imageengine
 ```
 
-IMPORTER
---------
+Class
+-----
 ```php
 use Coercive\Utility\Csv\ImageEngine\ImageEngine;
 
