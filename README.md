@@ -7,7 +7,7 @@ Coercive ImageEngine
 Get
 ---
 ```
-composer require coercive/imageengine
+composer require coercive/imgprocess
 ```
 
 Class
