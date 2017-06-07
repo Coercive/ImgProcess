@@ -1,7 +1,7 @@
 {
-    "name": "coercive/imageengine",
+    "name": "coercive/imgprocess",
     "type": "library",
-    "description": "Coercive Utility ImageEngine",
+    "description": "Coercive Utility ImgProcess",
     "homepage": "http://coercive.fr",
     "license": "GNU",
     "authors": [
@@ -16,7 +16,7 @@
     },
     "require-dev": {},
     "autoload": {
-        "psr-4": { "Coercive\\Utility\\ImageEngine\\": "" }
+        "psr-4": { "Coercive\\Utility\\ImgProcess\\": "" }
     },
     "minimum-stability" : "dev",
     "extra": {

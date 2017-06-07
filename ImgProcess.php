@@ -1,18 +1,18 @@
 <?php
-namespace Coercive\Utility\ImageEngine;
+namespace Coercive\Utility\ImgProcess;
 
 /**
- * ImageEngine
+ * ImgProcess
  * PHP Version 	7
  *
- * @package 	Coercive\Utility\ImageEngine
- * @link		@link https://github.com/Coercive/ImageEngine
+ * @package 	Coercive\Utility\ImgProcess
+ * @link		@link https://github.com/Coercive/ImgProcess
  *
  * @author  	Anthony Moral <contact@coercive.fr>
  * @copyright   (c) 2017 - 2018 Anthony Moral
  * @license 	http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-class ImageEngine {
+class ImgProcess {
 
 	const DEFAULT_JPG_QUALITY = 60;
 	const DEFAULT_PNG_COMPRESSION = 0;
@@ -137,7 +137,7 @@ class ImageEngine {
 	private $bOverwriting = false;
 
 	/**
-	 * ImageEngine constructor.
+	 * ImgProcess constructor.
 	 */
 	public function __construct() {
 
@@ -162,7 +162,7 @@ class ImageEngine {
 	 * SET OVERWRITING
 	 *
 	 * @param bool $bOverwriting [optional]
-	 * @return ImageEngine
+	 * @return $this
 	 */
 	public function setOverwriting($bOverwriting = false) {
 		$this->bOverwriting = (bool) $bOverwriting;
@@ -173,7 +173,7 @@ class ImageEngine {
 	 * SET JPG QUALITY
 	 *
 	 * @param int $iJpgQuality [optional]
-	 * @return ImageEngine
+	 * @return $this
 	 */
 	public function setJpgQuality($iJpgQuality = null) {
 		$this->_iJpgQuality = (int) (null === $iJpgQuality ? self::DEFAULT_JPG_QUALITY : $iJpgQuality);
@@ -184,7 +184,7 @@ class ImageEngine {
 	 * SET PNG QUALITY
 	 *
 	 * @param int $iPngCompression [optional] 0-9
-	 * @return ImageEngine
+	 * @return $this
 	 */
 	public function setPngCompression($iPngCompression = null) {
 		$this->_iPngCompression = (int) (null === $iPngCompression ? self::DEFAULT_PNG_COMPRESSION : $iPngCompression);
@@ -196,7 +196,7 @@ class ImageEngine {
 	 *
 	 * @param mixed $mSrcX
 	 * @param mixed $mSrcY
-	 * @return ImageEngine
+	 * @return $this
 	 */
 	public function setSourceCoordinate($mSrcX, $mSrcY) {
 
@@ -330,7 +330,7 @@ class ImageEngine {
 	 *
 	 * @param int $sWidth IN PIXEL (px)
 	 * @param int $sHeight IN PIXEL (px)
-	 * @return ImageEngine
+	 * @return $this
 	 */
 	public function setOutputSize($sWidth, $sHeight) {
 
@@ -350,7 +350,7 @@ class ImageEngine {
 	 * SET INPUT PATH
 	 *
 	 * @param string $sInputPath
-	 * @return ImageEngine
+	 * @return $this
 	 */
 	public function setInputPath($sInputPath) {
 
@@ -384,7 +384,7 @@ class ImageEngine {
 	 * SET OUTPUT PATH
 	 *
 	 * @param string $sOutputPath
-	 * @return ImageEngine
+	 * @return $this
 	 */
 	public function setOutputPath($sOutputPath) {
 

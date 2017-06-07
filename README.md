@@ -1,8 +1,7 @@
-Coercive ImageEngine
-====================
+Coercive ImgProcess
+===================
 
-- The ImageEngine allows you to easily resize your images in PHP with util options like "cover" which allows to cover a dimensioned area provided just as would do the css property of the same name; Or the "crop" that allows you to crop a specific area of ​​your image.
-
+- The ImgProcess allows you to easily resize your images in PHP with util options like "cover" which allows to cover a dimensioned area provided just as would do the css property of the same name; Or the "crop" that allows you to crop a specific area of ​​your image.
 
 Get
 ---
@@ -13,10 +12,10 @@ composer require coercive/imgprocess
 Class
 -----
 ```php
-use Coercive\Utility\Csv\ImageEngine\ImageEngine;
+use Coercive\Utility\ImgProcess\ImgProcess;
 
 # INIT
-$oImg = new ImageEngine;
+$oImg = new ImgProcess;
 
 # QUALITY (optional : default jpg 60 /  png 0)
 $oImg
