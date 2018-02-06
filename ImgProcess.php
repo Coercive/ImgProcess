@@ -663,16 +663,16 @@ class ImgProcess {
 		}
 
 		if ($iWidth) {
-			$iSourceWidth = $this->iOutputWidth / $iWidth * $this->iInputWidth;
-			$iSourceHeight = $this->iOutputHeight / ($this->iInputHeight / $this->iInputWidth * $iWidth) * $this->iInputHeight;
+			$this->iOutputWidth = $iWidth;
+			$this->iOutputHeight = $this->iInputHeight / $this->iInputWidth * $iWidth;
+			$this->iRatio = $this->iOutputWidth / $this->iInputWidth;
 		} else {
-			$iSourceWidth = $this->iOutputWidth / ($this->iInputWidth / $this->iInputHeight * $iHeight) * $this->iInputWidth;
-			$iSourceHeight = $this->iOutputHeight / $iHeight * $this->iInputHeight;
+			$this->iOutputHeight = $iHeight;
+			$this->iOutputWidth = $this->iInputWidth / $this->iInputHeight * $iHeight;
+			$this->iRatio = $this->iOutputHeight / $this->iInputHeight;
 		}
 
-		$this->iRatio = min($this->iOutputWidth/$iSourceWidth, $this->iOutputHeight, $iSourceHeight);
-
-		$bProcess = $this->process($iSourceWidth, $iSourceHeight);
+		$bProcess = $this->process($this->iInputWidth, $this->iInputHeight);
 		if (!$bProcess) {
 			$this->aError[] = '->myOwnSize(...) Process crash.';
 			return false;
