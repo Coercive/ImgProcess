@@ -3,7 +3,10 @@
     "type": "library",
     "description": "Coercive Utility ImgProcess",
     "homepage": "http://coercive.fr",
-    "license": "GNU",
+    "licenses": [{
+      "type": "MIT",
+      "url": "https://github.com/Coercive/ImgProcess/blob/master/LICENSE.txt"
+    }],
     "authors": [
         {
             "name": "Anthony Moral",
