@@ -17,6 +17,9 @@ class ImgProcess {
 	const DEFAULT_JPG_QUALITY = 60;
 	const DEFAULT_PNG_COMPRESSION = 0;
 
+	const FORMAT_VERTICAL = 'VERTICAL';
+	const FORMAT_HORIZONTAL = 'HORIZONTAL';
+
 	/**
 	 * JPG QUALITY
 	 *
@@ -680,6 +683,61 @@ class ImgProcess {
 
 		return true;
 
+	}
+
+	/**
+	 * MAX
+	 *
+	 * @param int $width
+	 * @param int $height
+	 * @return bool
+	 */
+	public function max(int $width, int $height): bool
+	{
+		# Verify empty
+		if (!$width && !$height) {
+			$this->aError[] = __METHOD__ . ' width or height needed.';
+			return false;
+		}
+
+		# Detect format
+		$format = $this->iInputWidth > $this->iInputHeight ? self::FORMAT_HORIZONTAL : self::FORMAT_VERTICAL;
+
+		# No resize if small
+		if($format === self::FORMAT_HORIZONTAL && (!$width || $width >= $this->iInputWidth)
+			|| $format === self::FORMAT_VERTICAL && (!$height || $height >= $this->iInputHeight)) {
+			return $this->sameSize();
+		}
+
+		# Prepare
+		switch ($format) {
+
+			case self::FORMAT_HORIZONTAL:
+				$this->iOutputWidth = $width;
+				$this->iOutputHeight = $this->iInputHeight / $this->iInputWidth * $width;
+				$this->iRatio = $this->iOutputWidth / $this->iInputWidth;
+				break;
+
+			case self::FORMAT_VERTICAL:
+				$this->iOutputHeight = $height;
+				$this->iOutputWidth = $this->iInputWidth / $this->iInputHeight * $height;
+				$this->iRatio = $this->iOutputHeight / $this->iInputHeight;
+				break;
+
+			default:
+				$this->aError[] = __METHOD__ . ' unknow format.';
+				return false;
+		}
+
+		# Process
+		$bProcess = $this->process($this->iInputWidth, $this->iInputHeight);
+
+		# Handle error / send status
+		if (!$bProcess) {
+			$this->aError[] = __METHOD__ . ' process crash.';
+			return false;
+		}
+		return true;
 	}
 
 	/**
