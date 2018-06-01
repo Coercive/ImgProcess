@@ -787,5 +787,20 @@ class ImgProcess {
 		return null;
 
 	}
+	
+	/**
+	 * RETRIEVE WIDTH AND HEIGHT FROM IMAGE PATH
+	 *
+	 * @param string $path
+	 * @return array
+	 */
+	public function getImageSize(string $path): array
+	{
+		$datas = @getimagesize($path);
+		return [
+			'width' => $datas[0] ?? 0,
+			'height' => $datas[1] ?? 0
+		];
+	}
 
 }
