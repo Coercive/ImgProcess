@@ -140,7 +140,22 @@ class ImgProcess {
 	private $bOverwriting = false;
 
 	/**
+	 * Set a background to your image
+	 *
+	 * @var array
+	 */
+	private array $fill = [
+		'enable' => false,
+		'red' => null,
+		'green' => null,
+		'blue' => null,
+		'alpha' => null,
+	];
+
+	/**
 	 * ImgProcess constructor.
+	 *
+	 * @return void
 	 */
 	public function __construct() {
 
@@ -150,6 +165,27 @@ class ImgProcess {
 		# INIT PNG COMPRESSION
 		$this->_iPngCompression = self::DEFAULT_PNG_COMPRESSION;
 
+	}
+
+	/**
+	 * Set a background to your image
+	 *
+	 * @param int $red
+	 * @param int $green
+	 * @param int $blue
+	 * @param int|null $alpha [optional]
+	 * @return $this
+	 */
+	public function fill(int $red, int $green, int $blue, ? int $alpha = null): ImgProcess
+	{
+		$this->fill = [
+			'enable' => true,
+			'red' => $red,
+			'green' => $green,
+			'blue' => $blue,
+			'alpha' => $alpha,
+		];
+		return $this;
 	}
 
 	/**
@@ -514,9 +550,21 @@ class ImgProcess {
 			return false;
 		}
 
+		if($this->fill['enable']) {
+			if(null === $this->fill['alpha']) {
+				$bgcolor = imagecolorallocate($this->rOutputRessource, $this->fill['red'], $this->fill['green'], $this->fill['blue']);
+			}
+			else {
+				$bgcolor = imagecolorallocatealpha($this->rOutputRessource, $this->fill['red'], $this->fill['green'], $this->fill['blue'], $this->fill['alpha']);
+			}
+			imagefill($this->rOutputRessource, 0, 0, $bgcolor);
+		}
+
 		if($this->sOutputExtension === 'gif' || $this->sOutputExtension === 'png') {
-			imagecolortransparent($this->rOutputRessource, imagecolorallocatealpha($this->rOutputRessource, 0, 0, 0, 127));
-			imagealphablending($this->rOutputRessource, false);
+			if(!$this->fill['enable']) {
+				imagecolortransparent($this->rOutputRessource, imagecolorallocatealpha($this->rOutputRessource, 0, 0, 0, 127));
+				imagealphablending($this->rOutputRessource, false);
+			}
 			imagesavealpha($this->rOutputRessource, true);
 		}
 
@@ -787,7 +835,7 @@ class ImgProcess {
 		return null;
 
 	}
-	
+
 	/**
 	 * RETRIEVE WIDTH AND HEIGHT FROM IMAGE PATH
 	 *
