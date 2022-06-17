@@ -3,14 +3,13 @@ namespace Coercive\Utility\ImgProcess;
 
 /**
  * ImgProcess
- * PHP Version 	7
  *
  * @package 	Coercive\Utility\ImgProcess
- * @link		@link https://github.com/Coercive/ImgProcess
+ * @link		https://github.com/Coercive/ImgProcess
  *
  * @author  	Anthony Moral <contact@coercive.fr>
- * @copyright   (c) 2017 - 2018 Anthony Moral
- * @license 	http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ * @copyright   (c) 2022 Anthony Moral
+ * @license 	MIT
  */
 class ImgProcess {
 
