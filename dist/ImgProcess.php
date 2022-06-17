@@ -579,7 +579,7 @@ class ImgProcess
 			imagefill($this->rOutputRessource, 0, 0, $bgcolor);
 		}
 
-		if($this->sOutputExtension === 'gif' || $this->sOutputExtension === 'png') {
+		if($this->sOutputExtension === 'gif' || $this->sOutputExtension === 'png' || $this->sOutputExtension === 'webp') {
 			if(!$this->fill['enable']) {
 				imagecolortransparent($this->rOutputRessource, imagecolorallocatealpha($this->rOutputRessource, 0, 0, 0, 127));
 				imagealphablending($this->rOutputRessource, false);
