@@ -15,23 +15,38 @@ class ImgProcess
 {
 	const DEFAULT_JPG_QUALITY = 60;
 	const DEFAULT_PNG_COMPRESSION = 0;
+	const DEFAULT_WEBP_QUALITY = 80;
 
 	const FORMAT_VERTICAL = 'VERTICAL';
 	const FORMAT_HORIZONTAL = 'HORIZONTAL';
+
+	const EXTENSIONS = [
+		'jpg', 'jpeg',
+		'png',
+		'gif',
+		'webp',
+	];
 
 	/**
 	 * JPG QUALITY
 	 *
 	 * @var int $_iJpgQuality
 	 */
-	private $_iJpgQuality = null;
+	private int $_iJpgQuality = self::DEFAULT_JPG_QUALITY;
 
 	/**
 	 * PNG COMPRESSION
 	 *
 	 * @var int $_iPngCompression
 	 */
-	private $_iPngCompression = null;
+	private int $_iPngCompression = self::DEFAULT_PNG_COMPRESSION;
+
+	/**
+	 * WEBP QUALITY
+	 *
+	 * @var int $_iWebpQuality
+	 */
+	private int $_iWebpQuality = self::DEFAULT_WEBP_QUALITY;
 
 	/**
 	 * INPUT /path/name.extension of the image
@@ -152,20 +167,6 @@ class ImgProcess
 	];
 
 	/**
-	 * ImgProcess constructor.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-		# INIT JPG QUALITY
-		$this->_iJpgQuality = self::DEFAULT_JPG_QUALITY;
-
-		# INIT PNG COMPRESSION
-		$this->_iPngCompression = self::DEFAULT_PNG_COMPRESSION;
-	}
-
-	/**
 	 * Set a background to your image
 	 *
 	 * @param int $red
@@ -229,6 +230,18 @@ class ImgProcess
 	public function setPngCompression(? int $compression = null): ImgProcess
 	{
 		$this->_iPngCompression = null === $compression ? self::DEFAULT_PNG_COMPRESSION : $compression;
+		return $this;
+	}
+
+	/**
+	 * SET WEBP QUALITY
+	 *
+	 * @param int|null $quality [optional]
+	 * @return $this
+	 */
+	public function setWebpQuality(? int $quality = null): ImgProcess
+	{
+		$this->_iWebpQuality = null === $quality ? self::DEFAULT_WEBP_QUALITY : $quality;
 		return $this;
 	}
 
@@ -318,32 +331,32 @@ class ImgProcess
 	 */
 	private function setExtension(string $direction, string $path): bool
 	{
-
-		if (!$direction || !is_string($direction) || ($direction != 'INPUT' && $direction != 'OUTPUT')) {
+		if ($direction !== 'INPUT' && $direction !== 'OUTPUT') {
 			$this->errors[] = '->setExtension(...) @var (string) $sWhich is needed and have to be equal of \'INPUT\' or \'OUTPUT\'.';
 			return false;
 		}
 
-		if (!$path || !is_string($path)) {
+		if (!$path) {
 			$this->errors[] = '->setExtension(...) @var (string) $sFullPath is needed.';
 			return false;
 		}
 
-		$sExtension = strtolower(substr(strrchr($path, '.'), 1));
-		if (!in_array($sExtension, ['jpg', 'jpeg', 'gif', 'png'], true)) {
-			$this->errors[] = '->setExtension(...) $sFullPath : The extension of the image is not recognized.';
+		$extension = strtolower(substr(strrchr($path, '.'), 1));
+		if (!in_array($extension, self::EXTENSIONS, true)) {
+			$this->errors[] = "->setExtension(...) The extension '$extension' of the image is not recognized.";
 			return false;
 		}
 
-		if ($sExtension === 'jpeg') {
-			$sExtension = 'jpg';
+		# Remap JPEG
+		if ($extension === 'jpeg') {
+			$extension = 'jpg';
 		}
 
 		if ($direction === 'INPUT') {
-			$this->sInputExtension = $sExtension;
+			$this->sInputExtension = $extension;
 		}
 		else {
-			$this->sOutputExtension = $sExtension;
+			$this->sOutputExtension = $extension;
 		}
 
 		return true;
@@ -512,13 +525,16 @@ class ImgProcess
 	{
 		switch($this->sInputExtension) {
 			case 'gif':
-				$this->rInputRessource = imagecreatefromgif( $this->sInputPath );
+				$this->rInputRessource = imagecreatefromgif($this->sInputPath);
 				break;
 			case 'jpg':
-				$this->rInputRessource = imagecreatefromjpeg( $this->sInputPath );
+				$this->rInputRessource = imagecreatefromjpeg($this->sInputPath);
 				break;
 			case 'png':
-				$this->rInputRessource = imagecreatefrompng( $this->sInputPath );
+				$this->rInputRessource = imagecreatefrompng($this->sInputPath);
+				break;
+			case 'webp':
+				$this->rInputRessource = imagecreatefromwebp($this->sInputPath);
 				break;
 			default :
 				$this->errors[] = '->setExtension(...) $sFullPath : The extension of the image is not recognized.';
@@ -529,7 +545,6 @@ class ImgProcess
 			$this->errors[] = '->setExtension(...) $sFullPath : The extension of the image is not recognized.';
 			return false;
 		}
-
 		return true;
 	}
 
@@ -621,6 +636,9 @@ class ImgProcess
 				break;
 			case 'png':
 				imagepng($this->rOutputRessource, $tmp, $this->_iPngCompression);
+				break;
+			case 'webp':
+				imagewebp($this->rOutputRessource, $tmp, $this->_iWebpQuality);
 				break;
 			default :
 				$this->errors[] = '->saveOutputImage(...) output extension : The extension of the image is not recognized.';
