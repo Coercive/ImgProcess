@@ -588,40 +588,43 @@ class ImgProcess {
 	 *
 	 * @return bool
 	 */
-	private function saveOutputImage() {
-
+	private function saveOutputImage(): bool
+	{
 		if (!$this->sOutputExtension) {
-			$this->aError[] = '->saveOutputImage(...) Can\'t find output_extension.';
+			$this->aError[] = '->saveOutputImage(...) Can\'t find output extension.';
 			return false;
 		}
 
 		if (!$this->rOutputRessource) {
-			$this->aError[] = '->saveOutputImage(...) Can\'t find output_ressource.';
+			$this->aError[] = '->saveOutputImage(...) Can\'t find output ressource.';
 			return false;
 		}
 
 		if (!$this->sOutputPath) {
-			$this->aError[] = '->saveOutputImage(...) Can\'t find output_path.';
+			$this->aError[] = '->saveOutputImage(...) Can\'t find output path.';
 			return false;
 		}
 
+		# Prepare output tmp empty file
+		$tmp = tempnam(sys_get_temp_dir(), 'tmp_coercive_imgprocess_');
+
 		switch($this->sOutputExtension) {
 			case 'gif':
-				imagegif($this->rOutputRessource, $this->sOutputPath);
+				imagegif($this->rOutputRessource, $tmp);
 				break;
 			case 'jpg':
-				imagejpeg($this->rOutputRessource, $this->sOutputPath, $this->_iJpgQuality);
+				imagejpeg($this->rOutputRessource, $tmp, $this->_iJpgQuality);
 				break;
 			case 'png':
-				imagepng($this->rOutputRessource, $this->sOutputPath, $this->_iPngCompression);
+				imagepng($this->rOutputRessource, $tmp, $this->_iPngCompression);
 				break;
 			default :
-				$this->aError[] = '->saveOutputImage(...) output_extension : The extension of the image is not recognized.';
+				$this->aError[] = '->saveOutputImage(...) output extension : The extension of the image is not recognized.';
 				return false;
 		}
 
-		return true;
-
+		# File move from tmp to preserve atomicity
+		return rename($tmp, $this->sOutputPath);
 	}
 
 	/**
