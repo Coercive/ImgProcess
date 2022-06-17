@@ -11,8 +11,8 @@ namespace Coercive\Utility\ImgProcess;
  * @copyright   (c) 2022 Anthony Moral
  * @license 	MIT
  */
-class ImgProcess {
-
+class ImgProcess
+{
 	const DEFAULT_JPG_QUALITY = 60;
 	const DEFAULT_PNG_COMPRESSION = 0;
 
@@ -127,16 +127,16 @@ class ImgProcess {
 	/**
 	 * ERROR(s) Message(s)
 	 *
-	 * @var array $aError
+	 * @var array $errors
 	 */
-	private $aError = [];
+	private array $errors = [];
 
 	/**
 	 * OVERWRITING output file if exist
 	 *
 	 * @var bool $overwriting
 	 */
-	private $bOverwriting = false;
+	private bool $bOverwriting = false;
 
 	/**
 	 * Set a background to your image
@@ -156,14 +156,13 @@ class ImgProcess {
 	 *
 	 * @return void
 	 */
-	public function __construct() {
-
+	public function __construct()
+	{
 		# INIT JPG QUALITY
 		$this->_iJpgQuality = self::DEFAULT_JPG_QUALITY;
 
 		# INIT PNG COMPRESSION
 		$this->_iPngCompression = self::DEFAULT_PNG_COMPRESSION;
-
 	}
 
 	/**
@@ -188,71 +187,73 @@ class ImgProcess {
 	}
 
 	/**
-	 * ERROR(s) Message(s)
+	 * Error Messages
 	 *
-	 * @return array $this->aError
+	 * @return array
 	 */
-	public function getError() {
-		return empty($this->aError) ? [] : $this->aError;
+	public function getErrors(): array
+	{
+		return $this->errors;
 	}
 
 	/**
 	 * SET OVERWRITING
 	 *
-	 * @param bool $bOverwriting [optional]
+	 * @param bool $status [optional]
 	 * @return $this
 	 */
-	public function setOverwriting($bOverwriting = false) {
-		$this->bOverwriting = (bool) $bOverwriting;
+	public function setOverwriting(bool $status = false): ImgProcess
+	{
+		$this->bOverwriting = $status;
 		return $this;
 	}
 
 	/**
 	 * SET JPG QUALITY
 	 *
-	 * @param int $iJpgQuality [optional]
+	 * @param int|null $quality [optional]
 	 * @return $this
 	 */
-	public function setJpgQuality($iJpgQuality = null) {
-		$this->_iJpgQuality = (int) (null === $iJpgQuality ? self::DEFAULT_JPG_QUALITY : $iJpgQuality);
+	public function setJpgQuality(? int $quality = null): ImgProcess
+	{
+		$this->_iJpgQuality = null === $quality ? self::DEFAULT_JPG_QUALITY : $quality;
 		return $this;
 	}
 
 	/**
 	 * SET PNG QUALITY
 	 *
-	 * @param int $iPngCompression [optional] 0-9
+	 * @param int|null $compression [optional] 0-9
 	 * @return $this
 	 */
-	public function setPngCompression($iPngCompression = null) {
-		$this->_iPngCompression = (int) (null === $iPngCompression ? self::DEFAULT_PNG_COMPRESSION : $iPngCompression);
+	public function setPngCompression(? int $compression = null): ImgProcess
+	{
+		$this->_iPngCompression = null === $compression ? self::DEFAULT_PNG_COMPRESSION : $compression;
 		return $this;
 	}
 
 	/**
 	 * SET SOURCE COORDINATE
 	 *
-	 * @param mixed $mSrcX
-	 * @param mixed $mSrcY
+	 * @param mixed $x
+	 * @param mixed $y
 	 * @return $this
 	 */
-	public function setSourceCoordinate($mSrcX, $mSrcY) {
-
-		if(!is_numeric($mSrcX) && (!is_string($mSrcX) || ($mSrcX !== 'LEFT' && $mSrcX !== 'CENTER' && $mSrcX !== 'RIGHT'))) {
-			$this->aError[] = '->setSourceCoordinate(...) @var (mixed) $mSrcX : Integer or String(\'LEFT\',\'CENTER\',\'RIGHT\') needed.';
+	public function setSourceCoordinate($x, $y): ImgProcess
+	{
+		if(!is_numeric($x) && ($x !== 'LEFT' && $x !== 'CENTER' && $x !== 'RIGHT')) {
+			$this->errors[] = '->setSourceCoordinate(...) @var (mixed) $mSrcX : Integer or String(\'LEFT\',\'CENTER\',\'RIGHT\') needed.';
 			return $this;
 		}
 
-		if(!is_numeric($mSrcY) && (!is_string($mSrcY) || ($mSrcY !== 'TOP' && $mSrcY !== 'MIDDLE' && $mSrcY !== 'BOTTOM'))) {
-			$this->aError[] = '->setSourceCoordinate(...) @var (mixed) $mSrcY : Integer or String(\'TOP\',\'MIDDLE\',\'BOTTOM\') needed.';
+		if(!is_numeric($y) && ($y !== 'TOP' && $y !== 'MIDDLE' && $y !== 'BOTTOM')) {
+			$this->errors[] = '->setSourceCoordinate(...) @var (mixed) $mSrcY : Integer or String(\'TOP\',\'MIDDLE\',\'BOTTOM\') needed.';
 			return $this;
 		}
 
-		$this->mSrcX = $mSrcX;
-		$this->mSrcY = $mSrcY;
-
+		$this->mSrcX = $x;
+		$this->mSrcY = $y;
 		return $this;
-
 	}
 
 	/**
@@ -260,72 +261,85 @@ class ImgProcess {
 	 *
 	 * @return bool
 	 */
-	private function calculatingSourceCoordinate() {
-
-		if(!$this->iInputWidth || !$this->iOutputWidth || !$this->iInputHeight || !$this->iOutputHeight || !$this->iRatio) {
-			if(!$this->iInputWidth) { $this->aError[] = '->calculatingSourceCoordinate(...) @var (int) input_width : Can\'t find Source Width.'; }
-			if(!$this->iInputHeight) { $this->aError[] = '->calculatingSourceCoordinate(...) @var (int) input_height : Can\'t find Source Height.'; }
-			if(!$this->iOutputWidth) { $this->aError[] = '->calculatingSourceCoordinate(...) @var (int) output_width : Can\'t find Source Width.'; }
-			if(!$this->iOutputHeight) { $this->aError[] = '->calculatingSourceCoordinate(...) @var (int) output_height : Can\'t find Height.'; }
-			if(!$this->iRatio) { $this->aError[] = '->calculatingSourceCoordinate(...) @var (int) ratio : Can\'t find Source Ratio.'; }
-			$this->aError[] = '->calculatingSourceCoordinate(...) WARNING : Use this method after setting image src & dst and new width & height!';
+	private function calculatingSourceCoordinate(): bool
+	{
+		if(!$this->iInputWidth) {
+			$this->errors[] = '->calculatingSourceCoordinate(...) @var (int) input_width : Can\'t find Source Width.';
+		}
+		if(!$this->iInputHeight) {
+			$this->errors[] = '->calculatingSourceCoordinate(...) @var (int) input_height : Can\'t find Source Height.';
+		}
+		if(!$this->iOutputWidth) {
+			$this->errors[] = '->calculatingSourceCoordinate(...) @var (int) output_width : Can\'t find output Width.';
+		}
+		if(!$this->iOutputHeight) {
+			$this->errors[] = '->calculatingSourceCoordinate(...) @var (int) output_height : Can\'t find output Height.';
+		}
+		if(!$this->iRatio) {
+			$this->errors[] = '->calculatingSourceCoordinate(...) @var (int) ratio : Can\'t find Source Ratio.';
+		}
+		if($this->errors) {
 			return false;
 		}
 
 		if(!is_numeric($this->mSrcX)) {
-			// LEFT X
-			if($this->mSrcX === 'LEFT') { $this->mSrcX = 0; }
-
-			// CENTER X
-			if($this->mSrcX === 'CENTER') { $this->mSrcX = ($this->iInputWidth - $this->iOutputWidth / $this->iRatio) / 2; }
-
-			// RIGHT X
-			if($this->mSrcX === 'RIGHT') { $this->mSrcX = $this->iInputWidth - $this->iOutputWidth / $this->iRatio; }
+			if($this->mSrcX === 'LEFT') {
+				$this->mSrcX = 0;
+			}
+			if($this->mSrcX === 'CENTER') {
+				$this->mSrcX = ($this->iInputWidth - $this->iOutputWidth / $this->iRatio) / 2;
+			}
+			if($this->mSrcX === 'RIGHT') {
+				$this->mSrcX = $this->iInputWidth - $this->iOutputWidth / $this->iRatio;
+			}
 		}
 
 		if(!is_numeric($this->mSrcY)) {
-			// TOP Y
-			if($this->mSrcY === 'TOP') { $this->mSrcY = 0; }
-
-			// MIDDLE Y
-			if($this->mSrcY === 'MIDDLE') { $this->mSrcY = ($this->iInputHeight - $this->iOutputHeight / $this->iRatio) / 2; }
-
-			// RIGHT Y
-			if( $this->mSrcY === 'BOTTOM' ) { $this->mSrcY = $this->iInputHeight - $this->iOutputHeight / $this->iRatio; }
+			if($this->mSrcY === 'TOP') {
+				$this->mSrcY = 0;
+			}
+			if($this->mSrcY === 'MIDDLE') {
+				$this->mSrcY = ($this->iInputHeight - $this->iOutputHeight / $this->iRatio) / 2;
+			}
+			if( $this->mSrcY === 'BOTTOM' ) {
+				$this->mSrcY = $this->iInputHeight - $this->iOutputHeight / $this->iRatio;
+			}
 		}
 
-		return (is_numeric($this->mSrcX) && is_numeric($this->mSrcY));
-
+		return is_numeric($this->mSrcX) && is_numeric($this->mSrcY);
 	}
 
 	/**
 	 * SET EXTENSION of the image file
 	 *
-	 * @param string $sWhich 'INPUT' | 'OUTPUT'
-	 * @param string $sFullPath
+	 * @param string $direction 'INPUT' | 'OUTPUT'
+	 * @param string $path
 	 * @return bool
 	 */
-	private function setExtension($sWhich, $sFullPath) {
+	private function setExtension(string $direction, string $path): bool
+	{
 
-		if (!$sWhich || !is_string($sWhich) || ($sWhich != 'INPUT' && $sWhich != 'OUTPUT')) {
-			$this->aError[] = '->setExtension(...) @var (string) $sWhich is needed and have to be equal of \'INPUT\' or \'OUTPUT\'.';
+		if (!$direction || !is_string($direction) || ($direction != 'INPUT' && $direction != 'OUTPUT')) {
+			$this->errors[] = '->setExtension(...) @var (string) $sWhich is needed and have to be equal of \'INPUT\' or \'OUTPUT\'.';
 			return false;
 		}
 
-		if (!$sFullPath || !is_string($sFullPath)) {
-			$this->aError[] = '->setExtension(...) @var (string) $sFullPath is needed.';
+		if (!$path || !is_string($path)) {
+			$this->errors[] = '->setExtension(...) @var (string) $sFullPath is needed.';
 			return false;
 		}
 
-		$sExtension = strtolower(substr(strrchr($sFullPath, '.'), 1));
-		if (!$sExtension || !is_string($sExtension) || ($sExtension !== 'jpg' && $sExtension !== 'jpeg' && $sExtension !== 'gif' && $sExtension !== 'png')) {
-			$this->aError[] = '->setExtension(...) $sFullPath : The extension of the image is not recognized.';
+		$sExtension = strtolower(substr(strrchr($path, '.'), 1));
+		if (!in_array($sExtension, ['jpg', 'jpeg', 'gif', 'png'], true)) {
+			$this->errors[] = '->setExtension(...) $sFullPath : The extension of the image is not recognized.';
 			return false;
 		}
 
-		if ($sExtension === 'jpeg') { $sExtension = 'jpg'; }
+		if ($sExtension === 'jpeg') {
+			$sExtension = 'jpg';
+		}
 
-		if ($sWhich == 'INPUT') {
+		if ($direction === 'INPUT') {
 			$this->sInputExtension = $sExtension;
 		}
 		else {
@@ -333,7 +347,6 @@ class ImgProcess {
 		}
 
 		return true;
-
 	}
 
 	/**
@@ -342,152 +355,145 @@ class ImgProcess {
 	 * @param string $sInputPath
 	 * @return bool
 	 */
-	private function setInputSize($sInputPath) {
-
-		if (!$sInputPath || !is_string($sInputPath)) {
-			$this->aError[] = '->setInputSize(...) @var (string) $sInputPath is needed.';
+	private function setInputSize(string $sInputPath): bool
+	{
+		if (!$sInputPath) {
+			$this->errors[] = '->setInputSize(...) @var (string) $sInputPath is needed.';
 			return false;
 		}
 
 		if (!list($this->iInputWidth, $this->iInputHeight) = getimagesize($sInputPath)) {
-			$this->aError[] = '->setInputSize(...) @var (string) input_path : Can\'t set Width & Height.';
+			$this->errors[] = '->setInputSize(...) @var (string) input_path : Can\'t set Width & Height.';
 			return false;
 		}
 
 		if (!$this->iInputWidth || !$this->iInputHeight) {
-			$this->aError[] = '->setInputSize(...) Width or Height empty.';
+			$this->errors[] = '->setInputSize(...) Width or Height empty.';
 			return false;
 		}
 
 		return true;
-
 	}
 
 	/**
 	 * SET OUTPUT SIZE
 	 *
-	 * @param int $sWidth IN PIXEL (px)
-	 * @param int $sHeight IN PIXEL (px)
+	 * @param int $w IN PIXEL (px)
+	 * @param int $h IN PIXEL (px)
 	 * @return $this
 	 */
-	public function setOutputSize($sWidth, $sHeight) {
-
-		if (!$sWidth || !is_int($sWidth) || !$sHeight || !is_int($sHeight) ) {
-			$this->aError[] = '->setOutputSize(...) @var (int) $sWidth & $iSourceHeighteigh is needed and can\'t be null.';
-			return $this;
+	public function setOutputSize(int $w, int $h): ImgProcess
+	{
+		if ($w && $h) {
+			$this->iOutputWidth = $w;
+			$this->iOutputHeight = $h;
 		}
-
-		$this->iOutputWidth = $sWidth;
-		$this->iOutputHeight = $sHeight;
-
+		else {
+			$this->errors[] = '->setOutputSize(...) @var (int) $w & $h are needed and can\'t be empty.';
+		}
 		return $this;
-
 	}
 
 	/**
 	 * SET INPUT PATH
 	 *
-	 * @param string $sInputPath
+	 * @param string $path
 	 * @return $this
 	 */
-	public function setInputPath($sInputPath) {
-
-		if (!$sInputPath || !is_string($sInputPath)) {
-			$this->aError[] = '->setInputPath(...) @var (string) $sInputPath is needed.';
+	public function setInputPath(string $path): ImgProcess
+	{
+		if (!$path) {
+			$this->errors[] = '->setInputPath(...) @var (string) $sInputPath is needed.';
 			return $this;
 		}
 
-		if (!file_exists($sInputPath) || !is_file($sInputPath)) {
-			$this->aError[] = '->setInputPath(...) $sInputPath is not a valid file.';
+		if (!is_file($path)) {
+			$this->errors[] = '->setInputPath(...) $sInputPath is not a valid file.';
 			return $this;
 		}
 
-		if (!$this->setExtension('INPUT', $sInputPath)) {
-			$this->aError[] = '->setInputPath(...) Extension problem. Can not continue.';
+		if (!$this->setExtension('INPUT', $path)) {
+			$this->errors[] = '->setInputPath(...) Extension problem. Can not continue.';
 			return $this;
 		}
 
-		if (!$this->setInputSize($sInputPath)) {
-			$this->aError[] = '->setInputPath(...) Size problem. Can not continue.';
+		if (!$this->setInputSize($path)) {
+			$this->errors[] = '->setInputPath(...) Size problem. Can not continue.';
 			return $this;
 		}
 
-		$this->sInputPath = $sInputPath;
-
+		$this->sInputPath = $path;
 		return $this;
-
 	}
 
 	/**
 	 * SET OUTPUT PATH
 	 *
-	 * @param string $sOutputPath
+	 * @param string $path
 	 * @return $this
 	 */
-	public function setOutputPath($sOutputPath) {
-
-		if (!$sOutputPath || !is_string($sOutputPath)) {
-			$this->aError[] = '->setOutputPath(...) @var (string) $sOutputPath is needed.';
+	public function setOutputPath(string $path): ImgProcess
+	{
+		if (!$path) {
+			$this->errors[] = '->setOutputPath(...) @var (string) $sOutputPath is needed.';
 			return $this;
 		}
 
-		if (!$this->bOverwriting && file_exists($sOutputPath)) {
-			$this->aError[] = '->setOutputPath(...) $sOutputPath already exist.';
+		if (!$this->bOverwriting && file_exists($path)) {
+			$this->errors[] = '->setOutputPath(...) $sOutputPath already exist.';
 			return $this;
 		}
 
-		if (!$this->setExtension('OUTPUT', $sOutputPath)) {
-			$this->aError[] = '->setOutputPath(...) Extension problem. Can not continue.';
+		if (!$this->setExtension('OUTPUT', $path)) {
+			$this->errors[] = '->setOutputPath(...) Extension problem. Can not continue.';
 			return $this;
 		}
 
-		$this->sOutputPath = $sOutputPath;
-
+		$this->sOutputPath = $path;
 		return $this;
-
 	}
 
 	/**
 	 * PROCESS
 	 *
-	 * @param int $iSourceWidth Source width
-	 * @param int $iSourceHeight Source heigth
+	 * @param float $w width
+	 * @param float $h heigth
 	 * @return bool
 	 */
-	private function process($iSourceWidth, $iSourceHeight) {
-
-		if($this->aError) {
-			$this->aError[] = '->process(...) Shutdown due to an error upstream process.';
+	private function process(float $w, float $h): bool
+	{
+		if($this->errors) {
+			$this->errors[] = '->process(...) Shutdown due to an error upstream process.';
 			return false;
 		}
 
 		$bCreateInputRessource = $this->createInputRessource();
 		if(!$bCreateInputRessource) {
-			$this->aError[] = '->process(...) Shutdown due to an error in creating input image ressource.';
+			$this->errors[] = '->process(...) Shutdown due to an error in creating input image ressource.';
 			return false;
 		}
 
 		$bCreateOutputRessource = $this->createOutputRessource();
 		if(!$bCreateOutputRessource) {
-			$this->aError[] = '->process(...) Shutdown due to an error in creating output image ressource.';
+			$this->errors[] = '->process(...) Shutdown due to an error in creating output image ressource.';
 			return false;
 		}
 
 		$bCoordinate = $this->calculatingSourceCoordinate();
 		if(!$bCoordinate) {
-			$this->aError[] = '->process(...) Shutdown due to an error in calculating source coordinate of the image.';
+			$this->errors[] = '->process(...) Shutdown due to an error in calculating source coordinate of the image.';
 			return false;
 		}
 
-		$bResampled = $this->outputImageResampled($iSourceWidth, $iSourceHeight);
+		$bResampled = $this->outputImageResampled($w, $h);
 		if(!$bResampled) {
-			$this->aError[] = '->process(...) Shutdown due to an error in resampling image.';
+			$this->errors[] = '->process(...) Shutdown due to an error in resampling image.';
 			return false;
 		}
 
 		$bSave = $this->saveOutputImage();
 		if(!$bSave) {
-			$this->aError[] = '->process(...) Shutdown due to an error in saving final image.';
+			$this->errors[] = '->process(...) Shutdown due to an error in saving final image.';
 			return false;
 		}
 
@@ -502,8 +508,8 @@ class ImgProcess {
 	 *
 	 * @return bool
 	 */
-	private function createInputRessource() {
-
+	private function createInputRessource(): bool
+	{
 		switch($this->sInputExtension) {
 			case 'gif':
 				$this->rInputRessource = imagecreatefromgif( $this->sInputPath );
@@ -515,17 +521,16 @@ class ImgProcess {
 				$this->rInputRessource = imagecreatefrompng( $this->sInputPath );
 				break;
 			default :
-				$this->aError[] = '->setExtension(...) $sFullPath : The extension of the image is not recognized.';
+				$this->errors[] = '->setExtension(...) $sFullPath : The extension of the image is not recognized.';
 				return false;
 		}
 
 		if (!$this->rInputRessource) {
-			$this->aError[] = '->setExtension(...) $sFullPath : The extension of the image is not recognized.';
+			$this->errors[] = '->setExtension(...) $sFullPath : The extension of the image is not recognized.';
 			return false;
 		}
 
 		return true;
-
 	}
 
 	/**
@@ -536,16 +541,16 @@ class ImgProcess {
 	 *
 	 * @return bool
 	 */
-	private function createOutputRessource() {
-
+	private function createOutputRessource(): bool
+	{
 		if(!$this->iOutputWidth || !$this->iOutputHeight) {
-			$this->aError[] = '->createOutputRessource(...) output_width | output_height  : New width and height are needed.';
+			$this->errors[] = '->createOutputRessource(...) output_width | output_height  : New width and height are needed.';
 			return false;
 		}
 
 		$this->rOutputRessource = imagecreatetruecolor( $this->iOutputWidth, $this->iOutputHeight ) ;
 		if (empty($this->sOutputExtension)) {
-			$this->aError[] = '->createOutputRessource(...) Can\'t find output_extension.';
+			$this->errors[] = '->createOutputRessource(...) Can\'t find output_extension.';
 			return false;
 		}
 
@@ -568,18 +573,18 @@ class ImgProcess {
 		}
 
 		return (bool) $this->rOutputRessource;
-
 	}
 
 	/**
 	 * Image Resizing
 	 *
-	 * @param int $iSourceWidth
-	 * @param int $iSourceHeight
+	 * @param float $w
+	 * @param float $h
 	 * @return bool
 	 */
-	private function outputImageResampled($iSourceWidth, $iSourceHeight) {
-		return imagecopyresampled($this->rOutputRessource, $this->rInputRessource, 0, 0, $this->mSrcX, $this->mSrcY, $this->iOutputWidth, $this->iOutputHeight, $iSourceWidth, $iSourceHeight);
+	private function outputImageResampled(float $w, float $h): bool
+	{
+		return imagecopyresampled($this->rOutputRessource, $this->rInputRessource, 0, 0, $this->mSrcX, $this->mSrcY, $this->iOutputWidth, $this->iOutputHeight, $w, $h);
 	}
 
 	/**
@@ -590,17 +595,17 @@ class ImgProcess {
 	private function saveOutputImage(): bool
 	{
 		if (!$this->sOutputExtension) {
-			$this->aError[] = '->saveOutputImage(...) Can\'t find output extension.';
+			$this->errors[] = '->saveOutputImage(...) Can\'t find output extension.';
 			return false;
 		}
 
 		if (!$this->rOutputRessource) {
-			$this->aError[] = '->saveOutputImage(...) Can\'t find output ressource.';
+			$this->errors[] = '->saveOutputImage(...) Can\'t find output ressource.';
 			return false;
 		}
 
 		if (!$this->sOutputPath) {
-			$this->aError[] = '->saveOutputImage(...) Can\'t find output path.';
+			$this->errors[] = '->saveOutputImage(...) Can\'t find output path.';
 			return false;
 		}
 
@@ -618,7 +623,7 @@ class ImgProcess {
 				imagepng($this->rOutputRessource, $tmp, $this->_iPngCompression);
 				break;
 			default :
-				$this->aError[] = '->saveOutputImage(...) output extension : The extension of the image is not recognized.';
+				$this->errors[] = '->saveOutputImage(...) output extension : The extension of the image is not recognized.';
 				return false;
 		}
 
@@ -628,8 +633,11 @@ class ImgProcess {
 
 	/**
 	 * CLEAR CACHE
+	 *
+	 * @return void
 	 */
-	private function clear_cache() {
+	private function clear_cache()
+	{
 		@ImageDestroy($this->rInputRessource);
 		@ImageDestroy($this->rOutputRessource);
 	}
@@ -637,116 +645,106 @@ class ImgProcess {
 	/**
 	 * IMAGE BACKGROUND FULL COVERED
 	 *
-	 * @param bool $bForce [optional] Force enlarge covered, else the source image can't be smaller than the ouput
+	 * @param bool $enlarge [optional] Force enlarge covered, else the source image can't be smaller than the ouput
 	 * @return bool
 	 */
-	public function cover($bForce = false) {
-
-		if (!$bForce && ($this->iInputWidth < $this->iOutputWidth || $this->iInputHeight < $this->iOutputHeight)) {
-			$this->aError[] = '->cover(...) Input image is too small. If you wan\'t to enlarge, you can force it';
+	public function cover(bool $enlarge = false): bool
+	{
+		if (!$enlarge && ($this->iInputWidth < $this->iOutputWidth || $this->iInputHeight < $this->iOutputHeight)) {
+			$this->errors[] = '->cover(...) Input image is too small. If you wan\'t to enlarge, you can force it';
 			return false;
 		}
 
 		$this->iRatio = max($this->iOutputWidth/$this->iInputWidth, $this->iOutputHeight/$this->iInputHeight);
 
-		$iSourceHeight = $this->iOutputHeight / $this->iRatio;
-		$iSourceWidth = $this->iOutputWidth / $this->iRatio;
-
-		$bProcess = $this->process($iSourceWidth, $iSourceHeight);
-		if (!$bProcess) {
-			$this->aError[] = '->cover(...) Process crash.';
+		$iSourceHeight = floatval($this->iOutputHeight / $this->iRatio);
+		$iSourceWidth = floatval($this->iOutputWidth / $this->iRatio);
+		if (!$this->process($iSourceWidth, $iSourceHeight)) {
+			$this->errors[] = '->cover(...) Process crash.';
 			return false;
 		}
-
 		return true;
-
 	}
 
 	/**
 	 * IMAGE CROP
 	 *
-	 * @param bool $bForce [optional] Force enlarge crop, else the source image do not resized
+	 * @param bool $enlarge [optional] Force enlarge crop, else the source image do not resized
 	 * @return bool
 	 */
-	public function crop($bForce = false) {
-
-		if (!$bForce && ($this->iInputWidth < $this->iOutputWidth || $this->iInputHeight < $this->iOutputHeight)) {
+	public function crop(bool $enlarge = false): bool
+	{
+		if (!$enlarge && ($this->iInputWidth < $this->iOutputWidth || $this->iInputHeight < $this->iOutputHeight)) {
 			$this->iRatio = 1;
-			$iSourceHeight = $this->iOutputHeight;
-			$iSourceWidth = $this->iOutputWidth;
+			$iSourceHeight = floatval($this->iOutputHeight);
+			$iSourceWidth = floatval($this->iOutputWidth);
 		}
 		else {
 			$this->iRatio = min($this->iOutputWidth/$this->iInputWidth , $this->iOutputHeight/$this->iInputHeight);
-			$iSourceHeight = $this->iOutputHeight / $this->iRatio;
-			$iSourceWidth = $this->iOutputWidth / $this->iRatio;
+			$iSourceHeight = floatval($this->iOutputHeight / $this->iRatio);
+			$iSourceWidth = floatval($this->iOutputWidth / $this->iRatio);
 		}
 
-		$bProcess = $this->process($iSourceWidth, $iSourceHeight);
-		if (!$bProcess) {
-			$this->aError[] = '->crop(...) Process crash.';
+		if (!$this->process($iSourceWidth, $iSourceHeight)) {
+			$this->errors[] = '->crop(...) Process crash.';
 			return false;
 		}
-
 		return true;
-
 	}
 
 	/**
 	 * MY OWN SIZE
 	 *
-	 * @param int $iWidth [optional]
-	 * @param int $iHeight [optional]
+	 * @param int|null $w [optional]
+	 * @param int|null $h [optional]
 	 * @return bool
 	 */
-	public function myOwnSize($iWidth = null, $iHeight = null) {
-
-		if ($iWidth === null && $iHeight === null) {
-			$this->aError[] = '->myOwnSize(...) @var $sWidth or $iHeight needed.';
+	public function myOwnSize(? int $w = null, ? int $h = null): bool
+	{
+		if ($w === null && $h === null) {
+			$this->errors[] = '->myOwnSize(...) @var $sWidth or $iHeight needed.';
 			return false;
 		}
 
-		if ($iWidth && $iHeight) {
-			$this->aError[] = '->myOwnSize(...) @var $sWidth & $iHeight ONLY ONE is needed, the other keeps ratio.';
+		if ($w && $h) {
+			$this->errors[] = '->myOwnSize(...) @var $sWidth & $iHeight ONLY ONE is needed, the other keeps ratio.';
 			return false;
 		}
 
-		if ($iWidth && !is_numeric($iWidth) || $iHeight && !is_numeric($iHeight)) {
-			$this->aError[] = '->myOwnSize(...) @var $sWidth or $iHeight have to be numeric values.';
+		if ($w && !is_numeric($w) || $h && !is_numeric($h)) {
+			$this->errors[] = '->myOwnSize(...) @var $sWidth or $iHeight have to be numeric values.';
 			return false;
 		}
 
-		if ($iWidth) {
-			$this->iOutputWidth = $iWidth;
-			$this->iOutputHeight = $this->iInputHeight / $this->iInputWidth * $iWidth;
+		if ($w) {
+			$this->iOutputWidth = $w;
+			$this->iOutputHeight = $this->iInputHeight / $this->iInputWidth * $w;
 			$this->iRatio = $this->iOutputWidth / $this->iInputWidth;
 		} else {
-			$this->iOutputHeight = $iHeight;
-			$this->iOutputWidth = $this->iInputWidth / $this->iInputHeight * $iHeight;
+			$this->iOutputHeight = $h;
+			$this->iOutputWidth = $this->iInputWidth / $this->iInputHeight * $h;
 			$this->iRatio = $this->iOutputHeight / $this->iInputHeight;
 		}
 
-		$bProcess = $this->process($this->iInputWidth, $this->iInputHeight);
-		if (!$bProcess) {
-			$this->aError[] = '->myOwnSize(...) Process crash.';
+		if (!$this->process(floatval($this->iInputWidth), floatval($this->iInputHeight))) {
+			$this->errors[] = '->myOwnSize(...) Process crash.';
 			return false;
 		}
-
 		return true;
-
 	}
 
 	/**
 	 * MAX
 	 *
-	 * @param int $width
-	 * @param int $height
+	 * @param int $w
+	 * @param int $h
 	 * @return bool
 	 */
-	public function max(int $width, int $height): bool
+	public function max(int $w, int $h): bool
 	{
 		# Verify empty
-		if (!$width && !$height) {
-			$this->aError[] = __METHOD__ . ' width or height needed.';
+		if (!$w && !$h) {
+			$this->errors[] = __METHOD__ . ' width or height needed.';
 			return false;
 		}
 
@@ -754,8 +752,8 @@ class ImgProcess {
 		$format = $this->iInputWidth > $this->iInputHeight ? self::FORMAT_HORIZONTAL : self::FORMAT_VERTICAL;
 
 		# No resize if small
-		if($format === self::FORMAT_HORIZONTAL && (!$width || $width >= $this->iInputWidth)
-			|| $format === self::FORMAT_VERTICAL && (!$height || $height >= $this->iInputHeight)) {
+		if($format === self::FORMAT_HORIZONTAL && (!$w || $w >= $this->iInputWidth)
+			|| $format === self::FORMAT_VERTICAL && (!$h || $h >= $this->iInputHeight)) {
 			return $this->sameSize();
 		}
 
@@ -763,28 +761,25 @@ class ImgProcess {
 		switch ($format) {
 
 			case self::FORMAT_HORIZONTAL:
-				$this->iOutputWidth = $width;
-				$this->iOutputHeight = $this->iInputHeight / $this->iInputWidth * $width;
+				$this->iOutputWidth = $w;
+				$this->iOutputHeight = $this->iInputHeight / $this->iInputWidth * $w;
 				$this->iRatio = $this->iOutputWidth / $this->iInputWidth;
 				break;
 
 			case self::FORMAT_VERTICAL:
-				$this->iOutputHeight = $height;
-				$this->iOutputWidth = $this->iInputWidth / $this->iInputHeight * $height;
+				$this->iOutputHeight = $h;
+				$this->iOutputWidth = $this->iInputWidth / $this->iInputHeight * $h;
 				$this->iRatio = $this->iOutputHeight / $this->iInputHeight;
 				break;
 
 			default:
-				$this->aError[] = __METHOD__ . ' unknow format.';
+				$this->errors[] = __METHOD__ . ' unknow format.';
 				return false;
 		}
 
-		# Process
-		$bProcess = $this->process($this->iInputWidth, $this->iInputHeight);
-
 		# Handle error / send status
-		if (!$bProcess) {
-			$this->aError[] = __METHOD__ . ' process crash.';
+		if (!$this->process(floatval($this->iInputWidth), floatval($this->iInputHeight))) {
+			$this->errors[] = __METHOD__ . ' process crash.';
 			return false;
 		}
 		return true;
@@ -795,47 +790,50 @@ class ImgProcess {
 	 *
 	 * @return bool
 	 */
-	public function sameSize() {
-
+	public function sameSize(): bool
+	{
 		$this->iRatio = 1;
 		$this->iOutputWidth = $this->iInputWidth;
 		$this->iOutputHeight = $this->iInputHeight;
 
-		$bProcess = $this->process($this->iInputWidth, $this->iInputHeight);
-		if (!$bProcess) {
-			$this->aError[] = '->sameSize(...) Process crash.';
+		if (!$this->process(floatval($this->iInputWidth), floatval($this->iInputHeight))) {
+			$this->errors[] = '->sameSize(...) Process crash.';
 			return false;
 		}
-
 		return true;
-
 	}
 
 	/**
 	 * GET IMAGE QUALITY FROM FILE
 	 *
-	 * @param string $sImgFilePath
+	 * @param string $path
 	 * @return int|null
 	 */
-	public function getImageQuality($sImgFilePath) {
-
+	static public function getImageQuality(string $path): ? int
+	{
 		# VERIFY
-		if(!file_exists($sImgFilePath) || !is_file($sImgFilePath)) { return null; }
-
-		# GET INFOS
-		exec("identify -verbose $sImgFilePath", $aOutpout);
-		if(!$aOutpout) { return null; }
-
-		# DETECT "Quality" line
-		foreach ($aOutpout as $sLine) {
-			$sLine = trim($sLine);
-			if(strpos($sLine, 'Quality: ') !== 0) { continue; }
-			$aQuality = explode(': ', $sLine);
-			if(isset($aQuality[1])) { return intval($aQuality[1]); }
+		if(!is_file($path)) {
+			return null;
 		}
 
-		return null;
+		# GET INFOS
+		exec("identify -verbose $path", $outpout);
+		if(!$outpout) {
+			return null;
+		}
 
+		# DETECT "Quality" line
+		foreach ($outpout as $line) {
+			$line = trim($line);
+			if(strpos($line, 'Quality: ') !== 0) {
+				continue;
+			}
+			$aQuality = explode(': ', $line);
+			if(isset($aQuality[1])) {
+				return intval($aQuality[1]);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -852,5 +850,4 @@ class ImgProcess {
 			'height' => $datas[1] ?? 0
 		];
 	}
-
 }
