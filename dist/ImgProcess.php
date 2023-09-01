@@ -1,6 +1,8 @@
 <?php
 namespace Coercive\Utility\ImgProcess;
 
+use Exception;
+
 /**
  * ImgProcess
  *
@@ -154,6 +156,23 @@ class ImgProcess
 	private bool $bOverwriting = false;
 
 	/**
+	 * EXIFROTATE can atomaticaly rotate image from exif data
+	 *
+	 * @var bool $exifRotate
+	 */
+	private bool $exifRotate = false;
+
+	/**
+	 * @var int $rotate in degrees
+	 */
+	private int $rotate = 0;
+
+	/**
+	 * @var int $flip IMG_FLIP_HORIZONTAL or IMG_FLIP_VERTICAL or IMG_FLIP_HORIZONTAL
+	 */
+	private int $flip = 0;
+
+	/**
 	 * Set a background to your image
 	 *
 	 * @var array
@@ -184,6 +203,40 @@ class ImgProcess
 			'blue' => $blue,
 			'alpha' => $alpha,
 		];
+		return $this;
+	}
+
+	/**
+	 * Use image exif for internaly auto-rotation and flip the image before resample.
+	 *
+	 * @param bool $status [optional]
+	 * @return $this
+	 */
+	public function setExifRotate(bool $status = true): ImgProcess
+	{
+		$this->exifRotate = $status;
+		return $this;
+	}
+
+	/**
+	 * @param int $deg
+	 * @return $this
+	 */
+	public function rotate(int $deg): self
+	{
+		$this->rotate = abs($deg);
+		return $this;
+	}
+
+	/**
+	 * @param int $mode IMG_FLIP_HORIZONTAL or IMG_FLIP_VERTICAL or IMG_FLIP_HORIZONTAL
+	 * @return $this
+	 */
+	public function flip(int $mode): self
+	{
+		if(in_array($mode, [IMG_FLIP_HORIZONTAL, IMG_FLIP_VERTICAL, IMG_FLIP_HORIZONTAL])) {
+			$this->flip = $mode;
+		}
 		return $this;
 	}
 
@@ -486,6 +539,22 @@ class ImgProcess
 			return false;
 		}
 
+		try {
+			$this->exifRotateCalculation();
+		}
+		catch (Exception $e) {
+			$this->errors[] = '->process(...) Shutdown due to an error in retrieving image exifs : ' . $e->getMessage();
+			return false;
+		}
+		if(!$this->inputImageFlip()) {
+			$this->errors[] = '->process(...) Shutdown due to an error in image flip.';
+			return false;
+		}
+		if(!$this->inputImageRotate()) {
+			$this->errors[] = '->process(...) Shutdown due to an error in image rotation.';
+			return false;
+		}
+
 		$bCreateOutputRessource = $this->createOutputRessource();
 		if(!$bCreateOutputRessource) {
 			$this->errors[] = '->process(...) Shutdown due to an error in creating output image ressource.';
@@ -514,6 +583,58 @@ class ImgProcess
 
 		return true;
 
+	}
+
+	/**
+	 * @return void
+	 * @throws Exception
+	 */
+	private function exifRotateCalculation()
+	{
+		if($this->exifRotate) {
+			$or = new Orientation($this->sInputPath);
+			$this->rotate = $or->getAngle();
+			$this->flip = $or->getFlip();
+		}
+	}
+
+	/**
+	 * Image Flip
+	 *
+	 * @return bool
+	 */
+	private function inputImageFlip(): bool
+	{
+		if(!$this->flip) {
+			return true;
+		}
+		return imageflip($this->rInputRessource, $this->flip);
+	}
+
+	/**
+	 * Image Rotate
+	 *
+	 * @return bool
+	 */
+	private function inputImageRotate(): bool
+	{
+		if(!$this->rotate) {
+			return true;
+		}
+
+		imagealphablending($this->rInputRessource, false);
+		imagesavealpha($this->rInputRessource, true);
+
+		$transparent = imageColorAllocateAlpha($this->rInputRessource, 0, 0, 0, 127);
+		$this->rInputRessource = imagerotate($this->rInputRessource, $this->rotate, $transparent);
+
+		imagealphablending($this->rInputRessource, false);
+		imagesavealpha($this->rInputRessource, true);
+
+		$this->iInputWidth = imagesx($this->rInputRessource) ?: 0;
+		$this->iInputHeight = imagesy($this->rInputRessource) ?: 0;
+
+		return $this->rInputRessource && $this->iInputWidth && $this->iInputHeight;
 	}
 
 	/**
