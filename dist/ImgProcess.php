@@ -168,7 +168,7 @@ class ImgProcess
 	private int $rotate = 0;
 
 	/**
-	 * @var int $flip IMG_FLIP_HORIZONTAL or IMG_FLIP_VERTICAL or IMG_FLIP_HORIZONTAL
+	 * @var int $flip IMG_FLIP_HORIZONTAL or IMG_FLIP_VERTICAL or IMG_FLIP_BOTH
 	 */
 	private int $flip = 0;
 
@@ -229,12 +229,12 @@ class ImgProcess
 	}
 
 	/**
-	 * @param int $mode IMG_FLIP_HORIZONTAL or IMG_FLIP_VERTICAL or IMG_FLIP_HORIZONTAL
+	 * @param int $mode IMG_FLIP_HORIZONTAL or IMG_FLIP_VERTICAL or IMG_FLIP_BOTH
 	 * @return $this
 	 */
 	public function flip(int $mode): self
 	{
-		if(in_array($mode, [IMG_FLIP_HORIZONTAL, IMG_FLIP_VERTICAL, IMG_FLIP_HORIZONTAL])) {
+		if(in_array($mode, [IMG_FLIP_HORIZONTAL, IMG_FLIP_VERTICAL, IMG_FLIP_BOTH])) {
 			$this->flip = $mode;
 		}
 		return $this;
