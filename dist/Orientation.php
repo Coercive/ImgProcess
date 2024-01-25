@@ -63,7 +63,7 @@ class Orientation
 			throw new Exception('Image path does not exist, or is not a file.');
 		}
 
-		$this->exifs = exif_read_data($image) ?: [];
+		$this->exifs = @exif_read_data($image) ?: [];
 		$this->orientation = intval($this->exifs['Orientation'] ?? $this->exifs['IFD0']['Orientation'] ?? 0);
 	}
 
