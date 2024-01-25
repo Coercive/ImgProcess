@@ -12,7 +12,8 @@
         }
     ],
     "require": {
-        "php": ">=7.4"
+        "php": ">=7.4",
+        "coercive/xml": "^0"
     },
     "require-dev": {},
     "autoload": {
