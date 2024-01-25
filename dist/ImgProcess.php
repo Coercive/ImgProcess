@@ -981,7 +981,7 @@ class ImgProcess
 	 * @param string $path
 	 * @return array
 	 */
-	public function getImageSize(string $path): array
+	static public function getImageSize(string $path): array
 	{
 		$datas = @getimagesize($path);
 		return [
