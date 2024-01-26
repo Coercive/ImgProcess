@@ -525,29 +525,32 @@ class ImgResponsive
 			$attr = $this->pictures['image']['attr'];
 			$attr['src'] = $this->pictures['image']['src'];
 
-			$srcset = $sizes = [];
-			if($this->multiplier) {
-				$srcset[] = $attr['src'] . ($size['media'] ? ' ' . $size['media'] : '');
-			}
-			foreach ($this->pictures['sources'] ?? [] as $source) {
+			unset($attr['sizes'], $attr['srcset']);
+			if($sources = $this->pictures['sources'] ?? []) {
+				$srcset = $sizes = [];
 				if($this->multiplier) {
-					$srcset[] = $source['src'] . ($source['size']['media'] ? ' ' . $source['size']['media'] : '');
+					$srcset[] = $attr['src'] . ($size['media'] ? ' ' . $size['media'] : '');
 				}
-				else {
-					$srcset[] = $source['src'] . ' ' . $source['size']['width'] . 'w';
-					if($m = $source['size']['media']) {
-						$sizes[] = $m;
+				foreach ($sources as $source) {
+					if($this->multiplier) {
+						$srcset[] = $source['src'] . ($source['size']['media'] ? ' ' . $source['size']['media'] : '');
+					}
+					else {
+						$srcset[] = $source['src'] . ' ' . $source['size']['width'] . 'w';
+						if($m = $source['size']['media']) {
+							$sizes[] = $m;
+						}
 					}
 				}
-			}
-			if(!$this->multiplier && $m = $this->pictures['image']['size']['media']) {
-				$sizes[] = $m;
-			}
-			if($sizes) {
-				$attr['sizes'] = implode(', ', $sizes);
-			}
-			if($srcset) {
-				$attr['srcset'] = implode(', ', $srcset);
+				if(!$this->multiplier && $m = $this->pictures['image']['size']['media']) {
+					$sizes[] = $m;
+				}
+				if($sizes) {
+					$attr['sizes'] = implode(', ', $sizes);
+				}
+				if($srcset) {
+					$attr['srcset'] = implode(', ', $srcset);
+				}
 			}
 
 			return FormatML::autoRebuild('img', '', $attr);
