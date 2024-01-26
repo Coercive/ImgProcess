@@ -115,7 +115,7 @@ $rii
 
 ```php
 $rii
-    ->modeSrcset()
+    ->modePicture()
     ->size(645, '(max-width: 750px) 645px')
     ->size(1095, '(min-width: 751px) and (max-width: 938px) 1095px')
     ->size(862, '(min-width: 939px) and (max-width: 1169px) 832px')
